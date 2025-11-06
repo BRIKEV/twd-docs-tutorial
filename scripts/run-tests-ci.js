@@ -1,0 +1,56 @@
+import puppeteer from "puppeteer";
+import { reportResults } from 'twd-js/runner-ci';
+
+const browser = await puppeteer.launch({
+  headless: true,
+  args: ['--lang=es-ES,es'],
+});
+const page = await browser.newPage();
+await page.emulateTimezone('Europe/Madrid');
+console.time('Total Test Time');
+try {
+  // Navigate to your development server
+  console.log('Navigating to http://localhost:5173 ...');
+  await page.goto('http://localhost:5173');
+  // wait to load data-testid="twd-sidebar"
+  await page.waitForSelector('[data-testid="twd-sidebar"]', { timeout: 10000 });
+  console.log('Page loaded. Starting tests...');
+  // reload page
+  // Execute all tests
+  const { handlers, testStatus } = await page.evaluate(async () => {
+    const TestRunner = window.__testRunner;
+    const testStatus = [];
+    const runner = new TestRunner({
+      onStart: () => {},
+      onPass: (test) => {
+        testStatus.push({ id: test.id, status: "pass" });
+      },
+      onFail: (test, err) => {
+        testStatus.push({ id: test.id, status: "fail", error: err.message });
+      },
+      onSkip: (test) => {
+        testStatus.push({ id: test.id, status: "skip" });
+      },
+    });
+    const handlers = await runner.runAll();
+    return { handlers: Array.from(handlers.values()), testStatus };
+  });
+  console.log(`Tests to report: ${testStatus.length}`);
+  
+  // Display results in console
+  reportResults(handlers, testStatus);
+
+  const coverage = await page.evaluate(() => window.__coverage__)
+
+  // Exit with appropriate code
+  const hasFailures = testStatus.some(test => test.status === 'fail');
+  console.timeEnd('Total Test Time');
+  process.exit(hasFailures ? 1 : 0);
+  
+} catch (error) {
+  console.error('Error running tests:', error);
+  process.exit(1);
+} finally {
+  console.log('Closing browser...');
+  await browser.close();
+}

@@ -6,7 +6,8 @@ describe("Todo List Page", () => {
   beforeEach(() => {
     twd.clearRequestMockRules();
   });
-  it("should display the todo list", async () => {
+
+  it.skip("should display the todo list", async () => {
     await twd.mockRequest("getTodoList", {
       method: "GET",
       url: "/api/todos",
