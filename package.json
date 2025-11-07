@@ -10,9 +10,7 @@
     "test": "vitest",
     "preview": "vite preview",
     "serve": "json-server --watch data/data.json --routes data/routes.json --port 3001",
-    "serve:dev": "npm-run-all --parallel serve dev",
-    "collect:coverage": "nyc report --reporter=html --report-dir=coverage --temp-dir=coverage",
-    "test:ci": "node scripts/run-tests-ci.js"
+    "serve:dev": "npm-run-all --parallel serve dev"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.4",
@@ -52,9 +50,6 @@
     "globals": "^16.0.0",
     "jsdom": "^26.1.0",
     "npm-run-all": "^4.1.5",
-    "nyc": "^17.1.0",
-    "puppeteer": "^24.29.1",
-    "twd-js": "^0.8.0",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.26.1",
     "vite": "^6.3.1",

@@ -3,19 +3,12 @@ import path from "path"
 import tailwindcss from "@tailwindcss/vite"
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import istanbul from 'vite-plugin-istanbul';
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    istanbul({
-      include: 'src/**/*',
-      exclude: ['node_modules', 'tests/'],
-      extension: ['.ts', '.tsx'],
-      requireEnv: process.env.CI ? true : false,
-    }),
   ],
   resolve: {
     alias: {
