@@ -7,7 +7,7 @@ describe("Todo List Page", () => {
     twd.clearRequestMockRules();
   });
 
-  it.skip("should display the todo list", async () => {
+  it("should display the todo list", async () => {
     await twd.mockRequest("getTodoList", {
       method: "GET",
       url: "/api/todos",
@@ -27,9 +27,9 @@ describe("Todo List Page", () => {
     const todo2Description = await twd.get("[data-testid='todo-description-2']");
     todo2Description.should("have.text", "Create a todo list application to demonstrate TWD features");
     const todo1Date = await twd.get("[data-testid='todo-date-1']");
-    todo1Date.should("have.text", "Date: 20/12/2024");
+    todo1Date.should("have.text", "Date: 2024-12-20");
     const todo2Date = await twd.get("[data-testid='todo-date-2']");
-    todo2Date.should("have.text", "Date: 25/12/2024");
+    todo2Date.should("have.text", "Date: 2024-12-25");
   });
 
   it("should delete a todo", async () => {
