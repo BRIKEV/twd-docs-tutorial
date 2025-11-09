@@ -1,12 +1,15 @@
+import fs from 'fs';
+import path from 'path';
 import puppeteer from "puppeteer";
 import { reportResults } from 'twd-js/runner-ci';
 
+let __dirname = path.resolve();
+
 const browser = await puppeteer.launch({
   headless: true,
-  args: ['--lang=es-ES,es'],
+  args: ['--no-sandbox', '--disable-setuid-sandbox'],
 });
 const page = await browser.newPage();
-await page.emulateTimezone('Europe/Madrid');
 console.time('Total Test Time');
 try {
   // Navigate to your development server
@@ -40,7 +43,23 @@ try {
   // Display results in console
   reportResults(handlers, testStatus);
 
-  const coverage = await page.evaluate(() => window.__coverage__)
+  const coverage = await page.evaluate(() => window.__coverage__);
+  if (coverage) {
+    console.log('Collecting code coverage data...');
+    const coverageDir = path.resolve(__dirname, './coverage');
+    const nycDir = path.resolve(__dirname, './.nyc_output');
+    if (!fs.existsSync(nycDir)) {
+      fs.mkdirSync(nycDir);
+    }
+    if (!fs.existsSync(coverageDir)) {
+      fs.mkdirSync(coverageDir);
+    }
+    const coveragePath = path.join(nycDir, 'out.json');
+    fs.writeFileSync(coveragePath, JSON.stringify(coverage));
+    console.log(`Code coverage data written to ${coveragePath}`);
+  } else {
+    console.log('No code coverage data found.');
+  }
 
   // Exit with appropriate code
   const hasFailures = testStatus.some(test => test.status === 'fail');

@@ -18,8 +18,6 @@ describe("Hello World Page", () => {
     counterButton.should("have.text", "Count is 2");
     
     await userEvent.click(counterButton.el);
-    console.log(counterButton.el.textContent);
-    
     counterButton.should("have.text", "Count is 3");
   });
 });
