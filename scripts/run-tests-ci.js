@@ -3,10 +3,8 @@ import { reportResults } from 'twd-js/runner-ci';
 
 const browser = await puppeteer.launch({
   headless: true,
-  args: ['--lang=es-ES,es'],
 });
 const page = await browser.newPage();
-await page.emulateTimezone('Europe/Madrid');
 console.time('Total Test Time');
 try {
   // Navigate to your development server
@@ -39,8 +37,6 @@ try {
   
   // Display results in console
   reportResults(handlers, testStatus);
-
-  const coverage = await page.evaluate(() => window.__coverage__)
 
   // Exit with appropriate code
   const hasFailures = testStatus.some(test => test.status === 'fail');
