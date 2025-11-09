@@ -3,6 +3,7 @@ import { reportResults } from 'twd-js/runner-ci';
 
 const browser = await puppeteer.launch({
   headless: true,
+  args: ['--no-sandbox', '--disable-setuid-sandbox'],
 });
 const page = await browser.newPage();
 console.time('Total Test Time');
