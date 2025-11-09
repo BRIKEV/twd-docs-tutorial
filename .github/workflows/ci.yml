@@ -23,7 +23,7 @@ jobs:
 
       - name: Start Vite dev server
         run: |
-          nohup npm run dev > vite.log 2>&1 &
+          nohup npm run dev:ci > vite.log 2>&1 &
           npx wait-on http://localhost:5173
         env:
           CI: true
@@ -32,4 +32,7 @@ jobs:
         run: npm run test:ci
         env:
           CI: true
-
+      
+      - name: Display coverage
+        run: |
+          npm run collect:coverage:text
