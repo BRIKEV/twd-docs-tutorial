@@ -1,10 +1,15 @@
-import { twd, userEvent, screenDom } from "twd-js";
+import { twd, screenDom } from "twd-js";
 import { describe, it } from "twd-js/runner";
 import { twdMockComponent } from "./componentMocks";
 
+interface CounterButtonProps {
+  count: number;
+  setCount: (count: number) => void;
+}
+
 describe("Hello World Page", () => {
   it("should display the welcome title and counter button", async () => {
-    twdMockComponent("CounterButton", ({ count, setCount }) => (
+    twdMockComponent<CounterButtonProps>("CounterButton", ({ count, setCount }) => (
       <button onClick={() => setCount(count + 2)}>Mock CounterButton</button>
     ));
     await twd.visit("/");

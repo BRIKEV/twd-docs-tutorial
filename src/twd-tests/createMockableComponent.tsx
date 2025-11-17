@@ -1,14 +1,19 @@
 import { getMockForComponent } from "./componentMocks";
 
-interface MockedComponentProps {
+interface MockedComponentProps<TProps = any> {
   name: string;
-  children: React.ReactElement;
+  children: React.ReactElement<TProps>;
 }
 
-export const MockedComponent = ({ name, children }: MockedComponentProps) => {
-  const Mock = getMockForComponent(name);
+export function MockedComponent<TProps extends Record<string, any>>({
+  name,
+  children,
+}: MockedComponentProps<TProps>) {
+  const Mock = getMockForComponent<TProps>(name);
 
-  if (Mock) return <Mock {...children.props} />;
+  if (Mock) {
+    return <Mock {...children.props} />;
+  }
 
   return children;
-};
+}
