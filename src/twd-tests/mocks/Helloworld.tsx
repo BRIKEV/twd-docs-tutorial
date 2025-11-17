@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { MockedComponent } from '@/twd-tests/createMockableComponent';
-import CounterButton from './CounterButton';
 
 export default function Helloworld() {
   const [count, setCount] = useState(0);
@@ -11,7 +9,7 @@ export default function Helloworld() {
       <div className="text-center space-y-8 max-w-2xl">
         <div className="space-y-4">
           <h1 className="text-6xl font-bold text-foreground" data-testid="welcome-title">
-            Welcome to TWD
+            Welcome to TWD Mock component
           </h1>
           <p className="text-xl text-muted-foreground">
             Test Web Dev - A powerful testing framework for web applications
@@ -27,16 +25,21 @@ export default function Helloworld() {
               rel="noopener noreferrer"
               className="text-primary underline font-medium"
             >
-              documentation {count}
+              documentation
             </a>
             .
           </p>
         </div>
 
         <div className="flex flex-col items-center gap-4 pt-8">
-          <MockedComponent name="CounterButton">
-            <CounterButton count={count} setCount={setCount} />
-          </MockedComponent>
+          <Button
+            onClick={() => setCount((count) => count + 1)}
+            size="lg"
+            className="min-w-[200px]"
+            data-testid="counter-button"
+          >
+            Count is {count}
+          </Button>
           <p className="text-sm text-muted-foreground">
             Click the button to test TWD features
           </p>
