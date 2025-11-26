@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MockedComponent } from 'twd-js';
+import { MockedComponent } from 'twd-js/ui';
 
 export default function QRScanner() {
   const [detectedCodes, setDetectedCodes] = useState<string[]>([]);

@@ -28,11 +28,20 @@ jobs:
         env:
           CI: true
 
-      - name: Run Puppeteer tests (test:ci)
+      - name: Cache Puppeteer browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/puppeteer
+          key: ${{ runner.os }}-puppeteer-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-puppeteer-
+
+      - name: Install Chrome for Puppeteer
+        run: npx puppeteer browsers install chrome
+
+      - name: Run TWD tests
         run: npx twd-cli run
-        env:
-          CI: true
-      
+
       - name: Display coverage
         run: |
           npm run collect:coverage:text
