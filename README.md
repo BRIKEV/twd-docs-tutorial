@@ -1,51 +1,106 @@
-# TWD Example: React Router v7 Data Mode
+# TWD + React Router v7 (Data Mode)
 
-This example demonstrates the data mode of React Router v7, which is my favorite mode for developing single-page applications (SPAs). It is the simplest approach because it leverages web standards, allowing you to define loaders and actions directly on routes for seamless data fetching and mutation. By using the React Router approach, you can avoid relying on additional state management or request management tools, keeping your application lightweight and straightforward.
+This repo demonstrates React Router v7 in data mode, tested end‑to‑end with TWD (`twd-js`). The app uses route loaders/actions for data, and TWD provides a browser‑native test runner you can use interactively during development or headlessly in CI.
 
-This example will include twd-js and test the application with TWD.
+For an overview of React Router data mode, see the [API and mode availability](https://reactrouter.com/start/modes#api--mode-availability-table).
 
-For a detailed overview of the features available in data mode, refer to the [React Router API and Mode Availability Table](https://reactrouter.com/start/modes#api--mode-availability-table).
+## Quick Start
 
-## Installation
-
-To use this mode, install the React Router library:
+- Install deps
 
 ```bash
-npm install react-router
+npm install
 ```
 
-## Running This Example
+- Start dev server + mock API (json‑server)
 
-Follow these steps to run the example:
+```bash
+npm run serve:dev
+```
 
-1. **Install Dependencies**  
-  Navigate to the project directory and install the required dependencies:
+Open the app at the Vite URL printed in the terminal. In dev, the TWD sidebar appears automatically and discovers tests from `.twd.test.ts(x)` files.
 
-  ```bash
-  npm install
-  ```
+## Where TWD Lives
 
-2. **Start the Development Server**  
-  Run the following command to start the development server and the fake data which is provided by [json-sever](https://www.npmjs.com/package/json-server).
+- Tests: [src/twd-tests](src/twd-tests)
+  - Examples: [src/twd-tests/helloWorld.twd.test.ts](src/twd-tests/helloWorld.twd.test.ts), [src/twd-tests/qrScanner.twd.test.tsx](src/twd-tests/qrScanner.twd.test.tsx), [src/twd-tests/todoList.twd.test.ts](src/twd-tests/todoList.twd.test.ts)
+- Dev wiring: TWD is initialized in [src/main.tsx](src/main.tsx) with `initTWD()` and `import.meta.glob("./**/*.twd.test.ts")` so tests are auto‑discovered in development.
 
-  ```bash
-  npm run serve:dev
-  ```
+### TWD Test Basics
 
-3. **Access the Application**  
-  Open your browser and navigate to the URL provided in the terminal to view the application.
+Common helpers used in this repo:
 
----
+```ts
+import { describe, it } from "twd-js/runner";
+import { twd, screenDom, userEvent, expect } from "twd-js";
 
-Feel free to explore the code in this folder to understand how declarative routing is implemented in this example.
+describe("Example", () => {
+  it("navigates and asserts", async () => {
+    await twd.visit("/");
+    const title = await screenDom.getByText("Welcome to TWD");
+    twd.should(title, "be.visible");
+  });
 
-## Tools Used in This Example
+  it("mocks requests", async () => {
+    await twd.mockRequest("getTodoList", { method: "GET", url: "/api/todos", response: [], status: 200 });
+    await twd.visit("/todos");
+    await twd.waitForRequest("getTodoList");
+  });
 
-This example leverages the following tools:
+  it("mocks components", async () => {
+    twd.mockComponent("qrScanner", ({ onScan }) => (
+      <button onClick={() => onScan([{ rawValue: "123" }])}>Mock scan</button>
+    ));
+    await twd.visit("/qr-scanner");
+  });
+});
+```
 
-- **React Router**: A library for declarative routing in React applications.
-- **json-server**: A simple tool to create a fake REST API for testing and prototyping.
-- **twd-js**: A library for testing React applications with TWD.
+## Running Tests
 
-These tools help demonstrate how data mode works in a practical scenario, with React Router handling navigation and data fetching, json-server providing mock data for the application, and React Router's built-in loaders and actions managing application state seamlessly without requiring additional state management libraries.
+### Interactive (recommended during development)
+- Use `npm run serve:dev` and open the app.
+- Trigger tests from the TWD sidebar in the browser (run all or individual tests).
+
+### Headless CI with coverage
+Run Vite with coverage instrumentation and the mock API, then execute the TWD CI runner:
+
+```bash
+# Terminal 1: mock API
+npm run serve
+
+# Terminal 2: Vite dev server with coverage env
+npm run dev:ci
+
+# Terminal 3: headless TWD runner (uses Puppeteer)
+npm run test:ci
+
+# Optional: generate coverage reports into ./coverage
+npm run collect:coverage:html
+# or
+npm run collect:coverage:lcov
+npm run collect:coverage:text
+```
+
+Notes:
+- `dev:ci` sets `CI=true` so `vite-plugin-istanbul` instruments code. The CI runner writes `.nyc_output/out.json`; the `collect:coverage:*` scripts turn that into reports.
+- The CI runner opens the dev server at `http://localhost:5173` and executes all discovered tests.
+
+## Running the App Only
+
+If you just want to browse the app without tests:
+
+```bash
+npm run serve:dev
+```
+
+## Tools
+
+- **React Router**: declarative routing with loaders/actions.
+- **json-server**: mock REST API ([data/data.json](data/data.json), [data/routes.json](data/routes.json)).
+- **twd-js**: interactive and headless testing for web apps.
+- **Vite + vite-plugin-istanbul**: dev server and coverage instrumentation.
+- **Puppeteer + NYC**: headless browser execution and coverage reporting.
+
+Explore the app routes and loaders in [src/AppRoutes.tsx](src/AppRoutes.tsx). TWD enables fast, realistic tests without extra state or request management libraries.
 
