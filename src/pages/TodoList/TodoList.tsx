@@ -47,7 +47,6 @@ const TodoList = () => {
             method="POST" 
             action="/todos"
             className="space-y-4"
-            data-testid="todo-form"
           >
             <div>
               <Label htmlFor="title" className="mb-2">Title</Label>
@@ -98,7 +97,7 @@ const TodoList = () => {
       <div className="space-y-4">
         {todos.length === 0 ? (
           <Card>
-            <CardContent className="py-8 text-center text-muted-foreground" data-testid="no-todos-message">
+            <CardContent className="py-8 text-center text-muted-foreground">
               No todos yet. Create one above!
             </CardContent>
           </Card>

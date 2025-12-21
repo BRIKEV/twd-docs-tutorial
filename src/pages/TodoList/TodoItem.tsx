@@ -12,13 +12,13 @@ export default function TodoItem({ todo }: TodoItemProps) {
   const isDeleting = deleteFetcher.state === "submitting" || deleteFetcher.state === "loading";
 
   return (
-    <Card data-testid="todo-item">
+    <Card>
       <CardHeader>
-        <CardTitle data-testid={`todo-title-${todo.id}`}>{todo.title}</CardTitle>
-        <CardDescription data-testid={`todo-description-${todo.id}`}>{todo.description}</CardDescription>
+        <CardTitle>{todo.title}</CardTitle>
+        <CardDescription>{todo.description}</CardDescription>
       </CardHeader>
       <CardFooter className="flex justify-between items-center">
-        <span className="text-sm text-muted-foreground" data-testid={`todo-date-${todo.id}`}>
+        <span className="text-sm text-muted-foreground">
           Date: {todo.date}
         </span>
         <deleteFetcher.Form method="DELETE" action="/todos">
@@ -28,7 +28,6 @@ export default function TodoItem({ todo }: TodoItemProps) {
             variant="destructive"
             size="sm"
             disabled={isDeleting}
-            data-testid={`delete-todo-${todo.id}`}
           >
             {isDeleting ? "Deleting..." : "Delete"}
           </Button>

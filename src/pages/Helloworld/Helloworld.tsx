@@ -8,7 +8,7 @@ export default function Helloworld() {
     <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-background">
       <div className="text-center space-y-8 max-w-2xl">
         <div className="space-y-4">
-          <h1 className="text-6xl font-bold text-foreground" data-testid="welcome-title">
+          <h1 className="text-6xl font-bold text-foreground">
             Welcome to TWD
           </h1>
           <p className="text-xl text-muted-foreground">
