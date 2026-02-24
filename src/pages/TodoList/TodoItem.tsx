@@ -28,6 +28,7 @@ export default function TodoItem({ todo }: TodoItemProps) {
             variant="destructive"
             size="sm"
             disabled={isDeleting}
+            aria-label={`Delete Todo ${todo.title}`}
           >
             {isDeleting ? "Deleting..." : "Delete"}
           </Button>
