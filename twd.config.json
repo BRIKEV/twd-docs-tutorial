@@ -1,0 +1,12 @@
+{
+  "url": "http://localhost:5173",
+  "contractReportPath": ".twd/contract-report.md",
+  "contracts": [
+    {
+      "source": "./contracts/todos-3.0.json",
+      "baseUrl": "/api",
+      "mode": "error",
+      "strict": true
+    }
+  ]
+}
