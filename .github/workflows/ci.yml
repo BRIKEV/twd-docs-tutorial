@@ -42,7 +42,9 @@ jobs:
         run: npx puppeteer browsers install chrome
 
       - name: Run TWD tests
-        run: npx twd-cli run
+        uses: BRIKEV/twd-cli/.github/actions/run@main
+        with:
+          contract-report: 'true'
 
       - name: Display coverage
         run: |

@@ -65,7 +65,8 @@
         ],
         "responses": {
           "200": {
-            "description": "Todo deleted"
+            "description": "Todo deleted",
+            "content": {}
           }
         }
       }
