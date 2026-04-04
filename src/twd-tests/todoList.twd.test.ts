@@ -93,7 +93,7 @@ describe("Todo List Page", () => {
       method: "DELETE",
       url: "/api/todos/1",
       response: null,
-      status: 200,
+      status: 204,
     });
     await twd.mockRequest("getTodoList", {
       method: "GET",

@@ -64,9 +64,8 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Todo deleted",
-            "content": {}
+          "204": {
+            "description": "Todo deleted"
           }
         }
       }
