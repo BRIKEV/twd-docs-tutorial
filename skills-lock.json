@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "skills": {
+    "end-learn": {
+      "source": "weorbitant/orbitant-poc-skills",
+      "sourceType": "github",
+      "computedHash": "1a83870f65d9253cda410121d7c9231eee6233ad45c0f1588f992f761eac9830"
+    },
+    "init-learning": {
+      "source": "weorbitant/orbitant-poc-skills",
+      "sourceType": "github",
+      "computedHash": "372617517b7e2281ffa509a1142678101e712ecccd4b794f4ef314f26320efbe"
+    },
+    "learn": {
+      "source": "weorbitant/orbitant-poc-skills",
+      "sourceType": "github",
+      "computedHash": "63b5c856c38f719a9016bf27968b3bebf601ed531e8a10f5f3f4baa10c0ea323"
+    },
+    "learning-report": {
+      "source": "weorbitant/orbitant-poc-skills",
+      "sourceType": "github",
+      "computedHash": "c9f728eb849c632ab3b024c381d6efebd9fd46fd3b854a2fa815baa2c1bce046"
+    },
+    "learning-status": {
+      "source": "weorbitant/orbitant-poc-skills",
+      "sourceType": "github",
+      "computedHash": "bd96be23e8ab12ff898fb150573b6282c1c0053e961dabb689148e5429fdc4d2"
+    },
+    "new-learning": {
+      "source": "weorbitant/orbitant-poc-skills",
+      "sourceType": "github",
+      "computedHash": "0906e88ff435ed87f91c9e70859c81a5bc2e3855a6123a6389a9e98ab43bbb9d"
+    }
+  }
+}

@@ -31,4 +31,8 @@ export default defineConfig({
       ignored: ["**/data/data.json", "**data/routes.json"],
     },
   },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+  },
 })
