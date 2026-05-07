@@ -6,12 +6,17 @@ import react from '@vitejs/plugin-react'
 // add plugin for code coverage
 import istanbul from 'vite-plugin-istanbul';
 import { twdRemote } from 'twd-relay/vite';
+import { twd } from 'twd-js/vite-plugin';
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+    twd({
+      testFilePattern: '/**/*.twd.test.ts',
+      search: true,
+    }),
     // configure istanbul plugin
     istanbul({
       include: 'src/**/*',
