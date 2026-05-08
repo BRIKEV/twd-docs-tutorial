@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
 import path from "path"
 import tailwindcss from "@tailwindcss/vite"
-import { defineConfig, PluginOption } from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 // add plugin for code coverage
 import istanbul from 'vite-plugin-istanbul';
@@ -24,7 +24,7 @@ export default defineConfig({
       extension: ['.ts', '.tsx'],
       requireEnv: process.env.CI ? true : false,
     }),
-    twdRemote() as PluginOption,
+    twdRemote(),
   ],
   resolve: {
     alias: {
