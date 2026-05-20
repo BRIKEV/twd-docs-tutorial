@@ -14,7 +14,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     twd({
-      testFilePattern: '/**/*.twd.test.ts',
+      testFilePattern: '/**/*.twd.test.{ts,tsx}',
       search: true,
     }),
     // configure istanbul plugin
