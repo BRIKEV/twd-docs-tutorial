@@ -17,7 +17,7 @@ describe("Todo List Page", () => {
     await twd.visit("/todos");
     await twd.waitForRequest("getTodoList");
     
-    const todo1Title = await screenDom.getByText("Learn TWD");
+    const todo1Title = await screenDom.getByText("Learn TWD Error");
     twd.should(todo1Title, "be.visible");
     
     const todo2Title = await screenDom.getByText("Build Todo App");
@@ -79,7 +79,7 @@ describe("Todo List Page", () => {
     await twd.waitForRequest("getTodoList");
     const rule = await twd.waitForRequest("createTodo");
     expect(rule.request).to.deep.equal({
-      title: "Test Todo",
+      title: "Test Todo Error",
       description: "Test Description",
       date: "2024-12-20",
     });
@@ -117,7 +117,7 @@ describe("Todo List Page", () => {
     });
     
     await userEvent.click(deleteButton);
-    await twd.waitForRequest("deleteTodo");
+    await twd.waitForRequest("deleteTodos");
     await twd.waitForRequest("getTodoList");
     
     const todoList = await screenDom.getAllByText(/Learn TWD|Build Todo App/);
