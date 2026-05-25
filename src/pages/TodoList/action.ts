@@ -21,11 +21,11 @@ export const todoActions = async ({ request }: ActionFunctionArgs) => {
       await createTodo(newTodo);
       return redirect("/todos");
     },
-    DELETE: async () => {
-      const id = formData.get("id") as string;
-      await deleteTodo(id);
-      return redirect("/todos");
-    },
+    // DELETE: async () => {
+    //   const id = formData.get("id") as string;
+    //   await deleteTodo(id);
+    //   return redirect("/todos");
+    // },
   };
 
   if (handlers[method]) {
