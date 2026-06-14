@@ -137,3 +137,11 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Vitest browser-mode artifacts
+.vitest-attachments/
+**/__screenshots__/
+
+# Tooling scratch dirs
+.serena/
+.twd/
