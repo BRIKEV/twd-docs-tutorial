@@ -21,6 +21,10 @@ const AppRoutes = createBrowserRouter([
     Component: QRScanner,
   },
   {
+    path: "/testin-library",
+    element: <div>Testin Library</div>,
+  },
+  {
     path: "*",
     element: <div>Not Found</div>,
   },
