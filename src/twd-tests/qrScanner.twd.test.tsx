@@ -14,22 +14,22 @@ describe("QR Scanner Page", () => {
     });
     await twd.visit("/qr-scanner");
 
-    const qrScanner = await screenDom.getByText("QR Code Scanner");
+    const qrScanner = await screenDom.findByText("QR Code Scanner");
     twd.should(qrScanner, "be.visible");
 
-    const qrScannerHeading = await screenDom.getByText("Scan QR Code");
+    const qrScannerHeading = await screenDom.findByText("Scan QR Code");
     twd.should(qrScannerHeading, "be.visible");
     
-    let detectedCodes = await screenDom.getByText("No codes detected yet");
+    let detectedCodes = await screenDom.findByText("No codes detected yet");
     twd.should(detectedCodes, "be.visible");
 
-    const qrCodeScannedButton = await screenDom.getByText("QR code scanned mocked");
+    const qrCodeScannedButton = await screenDom.findByText("QR code scanned mocked");
     twd.should(qrCodeScannedButton, "be.visible");
     await userEvent.click(qrCodeScannedButton);
 
-    detectedCodes = await screenDom.getByText("1 code(s) detected");
+    detectedCodes = await screenDom.findByText("1 code(s) detected");
     twd.should(detectedCodes, "be.visible");
-    const detectedCode = await screenDom.getByText("1234567890");
+    const detectedCode = await screenDom.findByText("1234567890");
     twd.should(detectedCode, "be.visible");
   });
 });

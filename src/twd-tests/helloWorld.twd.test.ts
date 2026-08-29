@@ -5,10 +5,10 @@ describe("Hello World Page", () => {
   it("should display the welcome title and counter button", async () => {
     await twd.visit("/");
     
-    const title = await screenDom.getByText("Welcome to TWD");
+    const title = await screenDom.findByText("Welcome to TWD");
     twd.should(title, 'be.visible');
     
-    const counterButton = await screenDom.getByText("Count is 0");
+    const counterButton = await screenDom.findByText("Count is 0");
     twd.should(counterButton, 'be.visible');
     
     await userEvent.click(counterButton);
