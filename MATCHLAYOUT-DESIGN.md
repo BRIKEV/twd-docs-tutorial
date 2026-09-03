@@ -320,18 +320,13 @@ del test no cambia: `expect(r.status, r.message).to.not.equal('failed')`.
 responsive (declarar `minWidth`/`maxWidth` por test) es exactamente eso: **una
 forma de que un test declare su viewport**.
 
-Las dos se necesitan:
+Un `matchLayout` por breakpoint es mucho más útil que uno solo a ancho de
+escritorio, que es justo donde menos se rompe el layout. Si las dos features
+avanzan, la resolución declarada en el test debería ser la que fija el viewport
+del snapshot.
 
-- Un `matchLayout` por breakpoint es mucho más útil que uno solo a ancho de
-  escritorio — y es precisamente donde más se rompe el layout.
-- Y si el responsive acaba renderizando la app en un **iframe** del ancho del
-  breakpoint, en vez de pedirle al dev que redimensione la ventana, el problema
-  del viewport en dev mode (§7) desaparece: el iframe da un ancho determinista,
-  y el `'skipped'` por viewport dejaría de hacer falta.
-
-Ese iframe resolvería tres cosas de golpe: responsive sin redimensionar, sidebar
-que deja de competir con la página, y snapshots deterministas en local. Merece
-evaluarse antes de construir cualquiera de las dos por separado.
+Lo que **no** resuelve el problema del viewport en dev: renderizar la app en un
+iframe. Ver §11.
 
 ### Lo que hay que explicarle al usuario
 
@@ -445,6 +440,10 @@ Otros abiertos:
 | `twd-relay` para escribir a disco | No está adaptado; un plugin de Vite es más simple |
 | Lanzar un error propio | `expect` de chai integra mejor con el resto de TWD |
 | Rejilla NxN relativa | Se desalinea al cambiar el tamaño (ver §3) |
+| Comparación posicional celda a celda | Un cambio de alto arriba desplaza la página y lo marca todo (ver §9) |
+| Umbral por brillo medio | Satura sobre fondo blanco: el hash sale `ffffff...` (ver §9) |
+| Desviación típica por celda | Hipersensible al desplazamiento subpíxel (ver §9) |
+| **Renderizar la app en un iframe** | **Probado y descartado: saca al dev de su flujo de desarrollo.** Eso no es TWD |
 
 `pixelmatch` conserva un hueco posible: generar el preview del fallo. Nunca el
 veredicto.
