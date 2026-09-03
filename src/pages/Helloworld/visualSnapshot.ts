@@ -386,7 +386,14 @@ export function annotateSizeChange(
 export function annotateRowDiff(
   canvas: HTMLCanvasElement,
   current: Grid,
-  ops: import('./rowDiff').RowOp[]
+  ops: import('./rowDiff').RowOp[],
+  /**
+   * Si el alto cambio, todo lo que hay debajo del cambio se desplaza y marcarlo
+   * entero es ruido: la pagina se llena de cajas que no señalan nada. En ese
+   * caso se marca solo el PRIMER bloque divergente — "el layout empieza a
+   * cambiar aqui" — que es lo unico accionable. El cuanto ya lo dice el tamano.
+   */
+  onlyFirstHunk = false
 ): HTMLCanvasElement {
   const out = document.createElement('canvas');
   out.width = canvas.width;
@@ -399,8 +406,17 @@ export function annotateRowDiff(
   const cellH = canvas.height / current.rows;
   ctx.lineWidth = 2;
 
+  let seenHunk = false;
+  let inHunk = false;
   for (const op of ops) {
-    if (op.op === 'same' || op.op === 'removed') continue;
+    if (op.op === 'same') {
+      if (inHunk) seenHunk = true;
+      inHunk = false;
+      continue;
+    }
+    if (op.op === 'removed') continue;
+    inHunk = true;
+    if (onlyFirstHunk && seenHunk) break;
     const y = op.currentRow * cellH;
 
     if (op.op === 'added') {

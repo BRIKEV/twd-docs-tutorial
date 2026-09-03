@@ -155,7 +155,7 @@ export async function matchLayout(el: HTMLElement, name: string): Promise<Layout
   const sameWidth = ref.w === dims(size).w;
   const hasNewArea = sameWidth && shot.grid.rows > prev.grid.rows;
 
-  let canvas = annotateRowDiff(shot.canvas, shot.grid, ops);
+  let canvas = annotateRowDiff(shot.canvas, shot.grid, ops, prev.size !== size);
   canvas = withLegend(canvas, [
     { ...MARK_CHANGED, label: 'changed' },
     ...(hasNewArea ? [{ ...MARK_NEW_AREA, label: 'new area' }] : []),

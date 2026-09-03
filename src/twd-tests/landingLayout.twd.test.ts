@@ -22,6 +22,17 @@ describe("Landing layout", () => {
     expect(result.status, result.message).to.not.equal("failed");
   });
 
+  it("detecta reordenacion sin cambio de alto", async () => {
+    await twd.visit("/landing-c");
+    const target = await screenDom.findByTestId("landing");
+
+    // C solo reordena: la pagina mide lo mismo, asi que `size` no lo ve y
+    // el veredicto depende SOLO de la rejilla. Es el caso limite.
+    const result = await matchLayout(target, "landing");
+    console.log("[spike] C", result.status, result.size, result.distance);
+    expect(result.status, result.message).to.not.equal("failed");
+  });
+
   it("detecta los elementos movidos", async () => {
     await twd.visit("/landing-b");
     const target = await screenDom.findByTestId("landing");
