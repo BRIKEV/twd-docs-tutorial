@@ -27,8 +27,11 @@ const FOOTER = [
   { title: 'Company', links: ['About', 'Careers', 'Contact'] },
 ];
 
-export default function Landing({ variant = 'a' }: { variant?: 'a' | 'b' }) {
+export default function Landing({ variant = 'a' }: { variant?: 'a' | 'b' | 'c' }) {
   const isB = variant === 'b';
+  // Variante C: solo reordena. Ninguno de sus cambios altera el alto de la
+  // pagina, asi que `size` no los ve y el veredicto depende solo de la rejilla.
+  const isC = variant === 'c';
 
   return (
     <div data-testid="landing" className="min-h-screen bg-white text-slate-900">
@@ -65,7 +68,7 @@ export default function Landing({ variant = 'a' }: { variant?: 'a' | 'b' }) {
               Catch layout regressions in the real runtime, before they ever reach a pull request.
               No cloud containers, no screenshots in git.
             </p>
-            <div className={`mt-8 flex gap-3 ${isB ? 'justify-start' : 'justify-center'}`}>
+            <div className={`mt-8 flex gap-3 ${isB || isC ? 'justify-start' : 'justify-center'}`}>
               <button className="rounded-md bg-slate-900 px-6 py-3 text-sm font-medium text-white">
                 Read the docs
               </button>
@@ -101,7 +104,7 @@ export default function Landing({ variant = 'a' }: { variant?: 'a' | 'b' }) {
           DOM assertions already cover your content. What they cannot see is the geometry.
         </p>
         <div className={`mt-10 grid gap-6 ${isB ? 'grid-cols-2' : 'grid-cols-3'}`}>
-          {FEATURES.map((feature) => (
+          {(isC ? [...FEATURES].reverse() : FEATURES).map((feature) => (
             <div key={feature.title} className="rounded-lg border border-slate-200 p-6">
               <p className="font-semibold">{feature.title}</p>
               <p className="mt-2 text-sm text-slate-600">{feature.body}</p>
@@ -114,10 +117,10 @@ export default function Landing({ variant = 'a' }: { variant?: 'a' | 'b' }) {
       <section className="border-y border-slate-200 bg-slate-50">
         <div
           className={`mx-auto grid max-w-6xl grid-cols-2 items-center gap-16 px-6 py-20 ${
-            isB ? 'flex-row-reverse [direction:rtl]' : ''
+            isB || isC ? '[direction:rtl]' : ''
           }`}
         >
-          <div className={isB ? '[direction:ltr]' : ''}>
+          <div className={isB || isC ? '[direction:ltr]' : ''}>
             <h2 className="text-3xl font-bold tracking-tight">Deterministic by design</h2>
             <p className="mt-4 text-slate-600">
               Request mocking pins the page state before the capture, so the same code always
@@ -158,7 +161,7 @@ export default function Landing({ variant = 'a' }: { variant?: 'a' | 'b' }) {
       {/* CAMBIO 5: el footer pasa de 4 a 3 columnas */}
       <footer className="mx-auto max-w-6xl px-6 py-12">
         <div className={`grid gap-8 ${isB ? 'grid-cols-3' : 'grid-cols-4'}`}>
-          {(isB ? FOOTER.slice(0, 3) : FOOTER).map((column) => (
+          {(isB ? FOOTER.slice(0, 3) : isC ? [...FOOTER].reverse() : FOOTER).map((column) => (
             <div key={column.title}>
               <p className="text-sm font-semibold">{column.title}</p>
               <ul className="mt-3 space-y-2 text-sm text-slate-500">

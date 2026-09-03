@@ -7,13 +7,13 @@
  * para poder mirar los dos y decidir si el .snap de texto basta o hace falta PNG.
  */
 import type { Grid } from './visualSnapshot';
+import { diffRows, rowDistance } from './rowDiff';
 import {
   MARK_CHANGED,
   MARK_NEW_AREA,
-  annotateChanges,
+  annotateRowDiff,
   annotateSizeChange,
   captureNode,
-  gridDistance,
   printDiff,
   printGrid,
   withLegend,
@@ -138,7 +138,8 @@ export async function matchLayout(el: HTMLElement, name: string): Promise<Layout
   }
 
   const prev = parse(baseline.snap);
-  const distance = gridDistance(prev.grid, shot.grid);
+  const ops = diffRows(prev.grid, shot.grid);
+  const distance = rowDistance(ops);
 
   // Un cambio de tamano ES un cambio de layout, aunque los bits no se muevan:
   // un texto de 20px cabe entero dentro de una celda y no mueve su promedio.
@@ -154,7 +155,7 @@ export async function matchLayout(el: HTMLElement, name: string): Promise<Layout
   const sameWidth = ref.w === dims(size).w;
   const hasNewArea = sameWidth && shot.grid.rows > prev.grid.rows;
 
-  let canvas = annotateChanges(shot.canvas, prev.grid, shot.grid, sameWidth);
+  let canvas = annotateRowDiff(shot.canvas, shot.grid, ops);
   canvas = withLegend(canvas, [
     { ...MARK_CHANGED, label: 'changed' },
     ...(hasNewArea ? [{ ...MARK_NEW_AREA, label: 'new area' }] : []),

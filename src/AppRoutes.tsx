@@ -30,6 +30,10 @@ const AppRoutes = createBrowserRouter([
     element: <Landing variant="b" />,
   },
   {
+    path: "/landing-c",
+    element: <Landing variant="c" />,
+  },
+  {
     path: "/testin-library",
     element: <div>Testin Library</div>,
   },

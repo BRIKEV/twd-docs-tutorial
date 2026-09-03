@@ -345,3 +345,43 @@ export function annotateSizeChange(
   ctx.drawImage(canvas, 0, band);
   return out;
 }
+
+/** Marca el resultado de un diff por filas sobre la captura actual. */
+export function annotateRowDiff(
+  canvas: HTMLCanvasElement,
+  current: Grid,
+  ops: import('./rowDiff').RowOp[]
+): HTMLCanvasElement {
+  const out = document.createElement('canvas');
+  out.width = canvas.width;
+  out.height = canvas.height;
+
+  const ctx = out.getContext('2d')!;
+  ctx.drawImage(canvas, 0, 0);
+
+  const cellW = canvas.width / current.cols;
+  const cellH = canvas.height / current.rows;
+  ctx.lineWidth = 2;
+
+  for (const op of ops) {
+    if (op.op === 'same' || op.op === 'removed') continue;
+    const y = op.currentRow * cellH;
+
+    if (op.op === 'added') {
+      ctx.fillStyle = MARK_NEW_AREA.fill;
+      ctx.strokeStyle = MARK_NEW_AREA.stroke;
+      ctx.fillRect(0, y, canvas.width, cellH);
+      ctx.strokeRect(0, y, canvas.width, cellH);
+      continue;
+    }
+
+    ctx.fillStyle = MARK_CHANGED.fill;
+    ctx.strokeStyle = MARK_CHANGED.stroke;
+    for (let col = 0; col < current.cols; col++) {
+      if (!op.cells[col]) continue;
+      ctx.fillRect(col * cellW, y, cellW, cellH);
+      ctx.strokeRect(col * cellW, y, cellW, cellH);
+    }
+  }
+  return out;
+}
