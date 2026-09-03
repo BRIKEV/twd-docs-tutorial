@@ -7,6 +7,7 @@ import react from '@vitejs/plugin-react'
 import istanbul from 'vite-plugin-istanbul';
 import { twdRemote } from 'twd-relay/vite';
 import { twd } from 'twd-js/vite-plugin';
+import { twdSnapshot } from './vite-plugin-twd-snapshot'; // SPIKE
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -25,6 +26,7 @@ export default defineConfig({
       requireEnv: process.env.CI ? true : false,
     }),
     twdRemote(),
+    twdSnapshot(), // SPIKE
   ],
   resolve: {
     alias: {

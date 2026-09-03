@@ -137,3 +137,6 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# SPIKE: la referencia que se commitea es el .snap, los PNG son solo para depurar en local
+__twd_snapshots__/*.png
