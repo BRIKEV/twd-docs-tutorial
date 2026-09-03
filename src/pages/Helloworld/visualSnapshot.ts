@@ -16,10 +16,17 @@
 
 export type Grid = { cells: number[]; rows: number; cols: number };
 
-/** Bit por celda: por encima de la media global de la captura. */
+/**
+ * Bit por celda: "¿hay contenido aqui?", con umbral FIJO.
+ *
+ * Antes era "¿por encima del brillo medio?" y saturaba: en una pagina de fondo
+ * blanco casi toda celda queda por encima, el hash salia ffffff... y los
+ * cambios en zonas claras (texto gris de un footer) eran invisibles.
+ */
+export const INK_THRESHOLD = 6;
+
 export function toBits(grid: Grid): boolean[] {
-  const mean = grid.cells.reduce((a, b) => a + b, 0) / grid.cells.length;
-  return grid.cells.map((g) => g >= mean);
+  return grid.cells.map((density) => density >= INK_THRESHOLD);
 }
 
 /** Copy every resolved computed style onto the clone, so CSS vars + stylesheets survive. */
@@ -131,26 +138,44 @@ export function printGrid(grid: Grid): string {
  */
 const COLS = 16;
 
+const SUB = 4; // submuestras por lado de celda
+
 function averageHash(canvas: HTMLCanvasElement, background: string): { hash: string; grid: Grid } {
   const cell = canvas.width / COLS;
   // Altura de destino FRACCIONARIA: si se redondea, la imagen se comprime al
-  // numero de filas y volvemos a desalinear. Asi la escala vertical es igual
-  // que la horizontal y cada fila cubre siempre la misma franja de pagina.
+  // numero entero de filas y volvemos a desalinear.
   const exactRows = canvas.height / cell;
   const rows = Math.max(1, Math.ceil(exactRows));
 
   const small = document.createElement('canvas');
-  small.width = COLS;
-  small.height = rows;
+  small.width = COLS * SUB;
+  small.height = rows * SUB;
   const ctx = small.getContext('2d')!;
   ctx.fillStyle = background;
-  ctx.fillRect(0, 0, COLS, rows);
-  ctx.drawImage(canvas, 0, 0, COLS, exactRows);
+  ctx.fillRect(0, 0, small.width, small.height);
+  ctx.drawImage(canvas, 0, 0, COLS * SUB, exactRows * SUB);
 
-  const { data } = ctx.getImageData(0, 0, COLS, rows);
+  const { data } = ctx.getImageData(0, 0, small.width, small.height);
+  const gray = (i: number) => 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+
+  // Densidad = desviacion tipica dentro de la celda. Mide si hay ESTRUCTURA
+  // (texto, bordes, un elemento) y no si la celda es clara u oscura, asi que
+  // funciona igual sobre fondo blanco que sobre una seccion oscura.
   const cells: number[] = [];
-  for (let i = 0; i < data.length; i += 4) {
-    cells.push(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < COLS; col++) {
+      const samples: number[] = [];
+      for (let sy = 0; sy < SUB; sy++) {
+        for (let sx = 0; sx < SUB; sx++) {
+          const x = col * SUB + sx;
+          const y = row * SUB + sy;
+          samples.push(gray((y * small.width + x) * 4));
+        }
+      }
+      const mean = samples.reduce((a, b) => a + b, 0) / samples.length;
+      const variance = samples.reduce((acc, v) => acc + (v - mean) ** 2, 0) / samples.length;
+      cells.push(Math.min(255, Math.sqrt(variance)));
+    }
   }
 
   const grid: Grid = { cells, rows, cols: COLS };
