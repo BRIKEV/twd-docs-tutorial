@@ -23,7 +23,7 @@ export type Grid = { cells: number[]; rows: number; cols: number };
  * blanco casi toda celda queda por encima, el hash salia ffffff... y los
  * cambios en zonas claras (texto gris de un footer) eran invisibles.
  */
-export const INK_THRESHOLD = 6;
+export const INK_THRESHOLD = 10;
 
 export function toBits(grid: Grid): boolean[] {
   return grid.cells.map((density) => density >= INK_THRESHOLD);
@@ -155,26 +155,37 @@ function averageHash(canvas: HTMLCanvasElement, background: string): { hash: str
   ctx.fillRect(0, 0, small.width, small.height);
   ctx.drawImage(canvas, 0, 0, COLS * SUB, exactRows * SUB);
 
+  // El gris del fondo se mide pintandolo solo, antes de dibujar la captura.
+  const probe = document.createElement('canvas');
+  probe.width = 1;
+  probe.height = 1;
+  const pctx = probe.getContext('2d')!;
+  pctx.fillStyle = background;
+  pctx.fillRect(0, 0, 1, 1);
+  const pd = pctx.getImageData(0, 0, 1, 1).data;
+  const backgroundGray = 0.299 * pd[0] + 0.587 * pd[1] + 0.114 * pd[2];
+
   const { data } = ctx.getImageData(0, 0, small.width, small.height);
   const gray = (i: number) => 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
 
-  // Densidad = desviacion tipica dentro de la celda. Mide si hay ESTRUCTURA
-  // (texto, bordes, un elemento) y no si la celda es clara u oscura, asi que
-  // funciona igual sobre fondo blanco que sobre una seccion oscura.
+  // Celda = cuanto se aleja del color de FONDO, promediado.
+  //  - brillo absoluto satura: sobre fondo blanco casi todo queda "encendido"
+  //  - desviacion tipica es hipersensible: un texto que se mueve 3px la cambia
+  // La distancia media al fondo no satura y promedia, asi que aguanta los
+  // desplazamientos pequenos que provoca un cambio de alto mas arriba.
+  const bg = gray(0) * 0 + backgroundGray;
   const cells: number[] = [];
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < COLS; col++) {
-      const samples: number[] = [];
+      let sum = 0;
       for (let sy = 0; sy < SUB; sy++) {
         for (let sx = 0; sx < SUB; sx++) {
           const x = col * SUB + sx;
           const y = row * SUB + sy;
-          samples.push(gray((y * small.width + x) * 4));
+          sum += Math.abs(gray((y * small.width + x) * 4) - bg);
         }
       }
-      const mean = samples.reduce((a, b) => a + b, 0) / samples.length;
-      const variance = samples.reduce((acc, v) => acc + (v - mean) ** 2, 0) / samples.length;
-      cells.push(Math.min(255, Math.sqrt(variance)));
+      cells.push(Math.min(255, sum / (SUB * SUB)));
     }
   }
 
