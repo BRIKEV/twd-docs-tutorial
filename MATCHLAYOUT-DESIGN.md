@@ -1,7 +1,11 @@
 # `matchLayout` — diseño para llevar a `twd-js`
 
-Conclusiones del spike (ver `VISUAL-TESTING-SPIKE.md` para el recorrido y los
-números). Este documento es el handoff: qué construir y por qué así.
+Conclusiones del spike, validadas ejecutando contra una landing real. Este
+documento es el handoff: qué construir, por qué así, y qué ya se descartó.
+
+El código throwaway vive en `src/pages/Helloworld/{visualSnapshot,matchLayout,rowDiff}.ts`
+y `vite-plugin-twd-snapshot.ts`, con las iteraciones en commits separados de la
+rama `feat/visual-testing`. El anexo (§12) recoge el recorrido y los números.
 
 ---
 
@@ -309,6 +313,25 @@ Layout snapshot "home" skipped - viewport mismatch
 
 Requiere un cuarto estado, `'skipped'`, que el runner ya contempla. La aserción
 del test no cambia: `expect(r.status, r.message).to.not.equal('failed')`.
+
+### Relación con el responsive testing
+
+`matchLayout` necesita un viewport fijo y determinista. La propuesta de tests
+responsive (declarar `minWidth`/`maxWidth` por test) es exactamente eso: **una
+forma de que un test declare su viewport**.
+
+Las dos se necesitan:
+
+- Un `matchLayout` por breakpoint es mucho más útil que uno solo a ancho de
+  escritorio — y es precisamente donde más se rompe el layout.
+- Y si el responsive acaba renderizando la app en un **iframe** del ancho del
+  breakpoint, en vez de pedirle al dev que redimensione la ventana, el problema
+  del viewport en dev mode (§7) desaparece: el iframe da un ancho determinista,
+  y el `'skipped'` por viewport dejaría de hacer falta.
+
+Ese iframe resolvería tres cosas de golpe: responsive sin redimensionar, sidebar
+que deja de competir con la página, y snapshots deterministas en local. Merece
+evaluarse antes de construir cualquiera de las dos por separado.
 
 ### Lo que hay que explicarle al usuario
 
