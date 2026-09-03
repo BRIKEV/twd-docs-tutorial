@@ -37,7 +37,7 @@ function hamming(a: boolean[], b: boolean[]): number {
  * mucho `tolerance` celdas. Sin tolerancia, una fila que se desplaza medio
  * pixel deja de emparejar y volvemos al ruido.
  */
-export function diffRows(baseline: Grid, current: Grid, tolerance = 2): RowOp[] {
+export function diffRows(baseline: Grid, current: Grid, tolerance = 1): RowOp[] {
   const a = rows(baseline);
   const b = rows(current);
   const same = (i: number, j: number) => hamming(a[i], b[j]) <= tolerance;
@@ -71,23 +71,40 @@ export function diffRows(baseline: Grid, current: Grid, tolerance = 2): RowOp[] 
   while (i < a.length) ops.push({ op: 'removed', baselineRow: i++ });
   while (j < b.length) ops.push({ op: 'added', currentRow: j++ });
 
-  // Un 'removed' pegado a un 'added' es en realidad una fila modificada:
-  // se fusionan para poder marcar QUE celdas cambiaron dentro de ella.
+  // Los 'removed' y 'added' salen del LCS en runs, no alternados. Se agrupan en
+  // bloques contiguos y dentro de cada bloque se emparejan, para poder marcar
+  // QUE celdas cambiaron en vez de pintar la fila entera como nueva.
   const merged: RowOp[] = [];
-  for (let k = 0; k < ops.length; k++) {
-    const cur = ops[k];
-    const next = ops[k + 1];
-    if (cur.op === 'removed' && next?.op === 'added') {
+  for (let k = 0; k < ops.length; ) {
+    if (ops[k].op === 'same') {
+      merged.push(ops[k++]);
+      continue;
+    }
+
+    let end = k;
+    while (end < ops.length && ops[end].op !== 'same') end++;
+    const hunk = ops.slice(k, end);
+    const removed = hunk.filter((o) => o.op === 'removed') as { baselineRow: number }[];
+    const added = hunk.filter((o) => o.op === 'added') as { currentRow: number }[];
+
+    const paired = Math.min(removed.length, added.length);
+    for (let n = 0; n < paired; n++) {
+      const br = removed[n].baselineRow;
+      const cr = added[n].currentRow;
       merged.push({
         op: 'changed',
-        baselineRow: cur.baselineRow,
-        currentRow: next.currentRow,
-        cells: a[cur.baselineRow].map((bit, c) => bit !== b[next.currentRow][c]),
+        baselineRow: br,
+        currentRow: cr,
+        cells: a[br].map((bit, c) => bit !== b[cr][c]),
       });
-      k++;
-    } else {
-      merged.push(cur);
     }
+    for (let n = paired; n < added.length; n++) {
+      merged.push({ op: 'added', currentRow: added[n].currentRow });
+    }
+    for (let n = paired; n < removed.length; n++) {
+      merged.push({ op: 'removed', baselineRow: removed[n].baselineRow });
+    }
+    k = end;
   }
   return merged;
 }
