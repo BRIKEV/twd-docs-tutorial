@@ -341,7 +341,58 @@ nombre a mano, que es duplicación.
 
 ---
 
-## 9. Pendiente de validar
+## 9. El desplazamiento vertical es el techo del enfoque
+
+Validado ejecutando contra una landing real (1120x2451) con twd-relay.
+
+### Comparar por posicion no funciona
+
+Si una seccion de arriba cambia de alto, **todo lo de abajo se desplaza** y una
+comparacion celda-contra-celda marca la pagina entera. Medido: la landing paso
+de 2451 a 2617 de alto y el overlay salio con cajas dispersas por todas partes,
+ninguna sobre los cambios reales. Ruido, no senal.
+
+**Arreglo: diff de secuencias por filas (LCS con tolerancia), como `git diff`.**
+Cada fila de la rejilla es una "linea"; una fila que solo se ha movido se
+empareja y no se marca. El ruido desaparecio de golpe.
+
+### Iteraciones sobre el criterio del bit
+
+| Criterio | Resultado |
+|---|---|
+| Brillo > media global | **Satura.** Sobre fondo blanco casi toda celda queda a 1, el hash sale `ffffff...` y los cambios en zonas claras son invisibles |
+| Desviacion tipica por celda | **Hipersensible.** Un texto que se mueve 3px cambia la densidad; ruido en toda la pagina |
+| Distancia media al color de fondo | **Punto medio.** No satura y aguanta desplazamientos pequenos. Es el que queda |
+
+### Regla: con cambio de alto, marcar solo la primera divergencia
+
+Ninguna de las iteraciones elimina el ruido cuando la altura cambia — es
+inherente al desplazamiento. Pero el cambio de alto **ya lo detecta `size`**,
+asi que el overlay no tiene que decir *cuanto*, solo *donde empieza*.
+
+Marcando unicamente el primer bloque divergente, el caso B pasa de 40 cajas
+dispersas a una sola banda sobre el hero, que es exactamente donde se introdujo
+el cambio.
+
+### Sin cambio de alto funciona limpio
+
+Variante C (solo reordena, la pagina mide lo mismo): detectado **solo por la
+rejilla**, sin ayuda de `size`, y el overlay marca con precision el CTA movido,
+las seis tarjetas reordenadas y la seccion invertida. **Cero ruido** en stats,
+titulo, testimonios y CTA.
+
+Un detalle que confirma el diseno: el footer con las columnas invertidas **no**
+se marca. Ocupan la misma geometria y solo cambia el texto de dentro — eso es
+contenido, y lo cubre `twd.should`.
+
+### Lo que queda como techo real
+
+Un cambio de alto arriba impide localizar cambios finos mas abajo: se sabe que
+la pagina diverge y donde empieza, no todo lo que cambio despues. Superarlo
+pide cambiar de enfoque — segmentar por bandas de contenido (perfil de
+proyeccion) en vez de rejilla fija — y eso ya no es una iteracion.
+
+## 10. Pendiente de validar
 
 **El caso que puede tumbar el enfoque:** romper el layout **sin** cambiar el
 tamaño exterior — un flex que colapsa dentro de una caja de altura fija. Todo lo
@@ -360,7 +411,7 @@ Otros abiertos:
 
 ---
 
-## 10. Descartado, y por qué
+## 11. Descartado, y por qué
 
 | Opción | Motivo |
 |---|---|
@@ -378,7 +429,7 @@ veredicto.
 
 ---
 
-## 11. Anexo: recorrido del spike
+## 12. Anexo: recorrido del spike
 
 Cómo se llegó a todo lo anterior, con los números medidos.
 
