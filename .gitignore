@@ -141,3 +141,6 @@ vite.config.ts.timestamp-*
 # SPIKE: la referencia que se commitea es el .snap, los PNG son solo para depurar en local
 # SPIKE: la baseline depende del viewport; que cada uno genere la suya
 __twd_snapshots__/
+
+# twd-cli run artifacts
+.twd/

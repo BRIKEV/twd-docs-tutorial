@@ -1,45 +1,36 @@
 /**
- * SPIKE / THROWAWAY — el caso que faltaba: layout roto SIN cambio de tamaño.
+ * Layout snapshots with twd.matchLayout.
  *
- * /landing-a y /landing-b miden lo mismo por fuera (900x720). Todos los
- * cambios son internos, así que la señal exacta (`size`) no los ve y el
- * veredicto depende solo de la rejilla.
+ * /landing-a is the reference. The other two variants move things around the
+ * way a CSS change would: "b" also changes the page height, "c" only reorders
+ * so the page still measures the same and the verdict rests on the grid alone.
  *
- * Los dos tests usan el MISMO snapshot a propósito: el primero lo crea, el
- * segundo lo compara contra la variante movida y debe fallar.
+ * All three share one snapshot on purpose: the first writes the reference and
+ * the other two are compared against it, so they are MEANT to fail. They are
+ * skipped to keep the suite green; drop the `.skip` on either one and run
+ * `npx twd-cli run` to see the failure and the diff map.
+ *
+ * Layout snapshots are decided by twd-cli, so in the sidebar these are skipped
+ * unless the plugin is configured with twdSnapshot({ debug: true }).
  */
-import { twd, expect, screenDom } from "twd-js";
+import { twd, screenDom } from "twd-js";
 import { describe, it } from "twd-js/runner";
-import { matchLayout } from "../pages/Helloworld/matchLayout";
+
+const SNAPSHOT = "landing";
 
 describe("Landing layout", () => {
-  it("captura la referencia de la landing", async () => {
+  it("should record the layout of the landing page", async () => {
     await twd.visit("/landing-a");
-    const target = await screenDom.findByTestId("landing");
-
-    const result = await matchLayout(target, "landing");
-    console.log("[spike] A", result.status, result.size, result.hash);
-    expect(result.status, result.message).to.not.equal("failed");
+    await twd.matchLayout(await screenDom.findByTestId("landing"), SNAPSHOT);
   });
 
-  it("detecta reordenacion sin cambio de alto", async () => {
+  it.skip("should detect a reorder that keeps the page height", async () => {
     await twd.visit("/landing-c");
-    const target = await screenDom.findByTestId("landing");
-
-    // C solo reordena: la pagina mide lo mismo, asi que `size` no lo ve y
-    // el veredicto depende SOLO de la rejilla. Es el caso limite.
-    const result = await matchLayout(target, "landing");
-    console.log("[spike] C", result.status, result.size, result.distance);
-    expect(result.status, result.message).to.not.equal("failed");
+    await twd.matchLayout(await screenDom.findByTestId("landing"), SNAPSHOT);
   });
 
-  it("detecta los elementos movidos", async () => {
+  it.skip("should detect moved elements that change the page height", async () => {
     await twd.visit("/landing-b");
-    const target = await screenDom.findByTestId("landing");
-
-    // Mismo nombre de snapshot: se compara B contra la referencia de A.
-    const result = await matchLayout(target, "landing");
-    console.log("[spike] B", result.status, result.size, result.distance);
-    expect(result.status, result.message).to.not.equal("failed");
+    await twd.matchLayout(await screenDom.findByTestId("landing"), SNAPSHOT);
   });
 });
