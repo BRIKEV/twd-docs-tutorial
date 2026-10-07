@@ -1,6 +1,6 @@
 {
   "url": "http://localhost:5173",
-  "contractReportPath": ".twd/contract-report.md",
+  "coverage": true,
   "contracts": [
     {
       "source": "./contracts/todos-3.0.json",

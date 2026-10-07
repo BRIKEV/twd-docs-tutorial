@@ -1,0 +1,88 @@
+name: Record a PR's tests
+
+# Label a PR `record` and this records the tests the branch added, then comments
+# the link. Deliberately separate from the test workflow: a recording is
+# optional, the pull request it describes is not.
+on:
+  pull_request:
+    types: [labeled]
+
+concurrency:
+  group: record-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  record:
+    # The label is the permission gate; a PR from a fork never reaches this job.
+    if: >-
+      github.event.label.name == 'record' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    # Belt, not workaround: a recording must never cost more than a recording.
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write # comment the link, drop the label
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      # The PR head, not the merge commit. fetch-depth: 0 because changed-since
+      # needs the base commit in history.
+      - name: Checkout the PR head
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # json-server first: the app's axios client talks to it on port 3001.
+      - name: Start mock API
+        run: |
+          nohup npm run serve > json-server.log 2>&1 &
+          npx wait-on http://localhost:3001/todos
+
+      # The action assumes the app is already served at the url in twd.config.json.
+      # Plain `dev`: a recording does not need coverage instrumentation.
+      - name: Start Vite dev server
+        run: |
+          nohup npm run dev > vite.log 2>&1 &
+          npx wait-on http://localhost:5173
+
+      - name: Record the tests this branch added
+        id: rec
+        uses: BRIKEV/twd-cli/.github/actions/record@88f0ea912ae9b7c3bbc374e95fe876a58b4114b7 # v1.10.0
+        with:
+          changed-since: ${{ github.event.pull_request.base.sha }}
+          artifact-name: twd-recording-pr-${{ github.event.pull_request.number }}
+
+      # Best effort: a fork PR gets a read-only token and cannot comment. Zero
+      # clips is a normal outcome, not a failure.
+      - name: Comment the link
+        if: always()
+        continue-on-error: true
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          CLIPS: ${{ steps.rec.outputs.clip-count }}
+          VIDEO_URL: ${{ steps.rec.outputs.artifact-url }}
+        run: |
+          if [ "${CLIPS:-0}" = "0" ]; then
+            gh pr comment "$PR_NUMBER" --body "Nothing to record: this branch added no TWD tests."
+          else
+            gh pr comment "$PR_NUMBER" --body "Recording: ${CLIPS} clip(s), one per test this branch added — [download the artifact](${VIDEO_URL}) and unzip."
+          fi
+
+      # Dropping the label makes a retry one click instead of remove-then-add.
+      - name: Drop the label
+        if: always()
+        continue-on-error: true
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: gh pr edit "$PR_NUMBER" --remove-label record
