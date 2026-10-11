@@ -57,6 +57,7 @@
     "nyc": "^18.0.0",
     "twd-cli": "1.10.0",
     "twd-js": "^1.10.1",
+    "twd-lint": "^1.0.0",
     "twd-relay": "^1.4.0",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.59.1",
