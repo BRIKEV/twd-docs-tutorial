@@ -58,7 +58,7 @@ jobs:
 
       - name: Record the tests this branch added
         id: rec
-        uses: BRIKEV/twd-cli/.github/actions/record@2bc1f7f6c0f68e40ba961e865ab025c092976530 # v1.11.0
+        uses: BRIKEV/twd-cli/.github/actions/record@104be76c1bb4902ab6407862e661cb6ba368e643 # v1.12.0
         with:
           changed-since: ${{ github.event.pull_request.base.sha }}
           artifact-name: twd-recording-pr-${{ github.event.pull_request.number }}
